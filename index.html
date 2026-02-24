@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIM DAHA VİRAL?</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --y: #FFE500; --b: #0A0A0A; --r: #FF1744;
+  --w: #F5F5F0; --g: #1A1A1A; --dim: #555;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--b); color: var(--w); font-family: 'Barlow Condensed', sans-serif; overflow-x: hidden; cursor: none; }
+
+/* CURSOR */
+#cur { width:20px;height:20px;background:var(--y);position:fixed;z-index:9999;pointer-events:none;mix-blend-mode:difference;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);transition:transform 0.1s; }
+
+/* NOISE */
+body::after { content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9990;opacity:0.5; }
+
+/* TICKER */
+.ticker { background:var(--y);color:var(--b);padding:10px 0;overflow:hidden;white-space:nowrap;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;position:sticky;top:0;z-index:500; }
+.ticker-inner { display:inline-block;animation:tick 18s linear infinite; }
+@keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* NAV */
+nav { padding:28px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e1e1e; }
+.nav-logo { font-family:'Archivo Black',sans-serif;font-size:22px;letter-spacing:4px;color:var(--y); }
+.nav-right { display:flex;gap:32px;align-items:center; }
+.nav-link { font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s; }
+.nav-link:hover { color:var(--y); }
+.nav-cta { background:var(--y);color:var(--b);font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:10px 20px;text-decoration:none;transition:all 0.15s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px)); }
+.nav-cta:hover { background:var(--r);color:var(--w); }
+
+/* HERO */
+.hero { min-height:90vh;display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #1e1e1e; }
+.hero-left { padding:72px 48px;border-right:1px solid #1e1e1e;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden; }
+.hero-left::before { content:'';position:absolute;bottom:-40px;right:-40px;width:320px;height:320px;background-image:radial-gradient(circle,rgba(255,229,0,0.15) 2px,transparent 2px);background-size:18px 18px;animation:dots 6s ease-in-out infinite;pointer-events:none; }
+@keyframes dots { 0%,100%{transform:translate(0,0) rotate(0deg)} 50%{transform:translate(-10px,-10px) rotate(3deg)} }
+
+.hero-eyebrow { font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--y);font-family:'DM Mono',monospace;animation:fadeUp 0.6s ease both; }
+
+.hero-title { font-family:'Archivo Black',sans-serif;font-size:clamp(64px,10vw,140px);line-height:0.88;letter-spacing:-2px;margin:24px 0 0;animation:fadeUp 0.6s ease 0.1s both; }
+.hero-title .l1 { color:var(--w);display:block; }
+.hero-title .l2 { display:block;color:transparent;-webkit-text-stroke:2px var(--y);position:relative; }
+.hero-title .l2::before,.hero-title .l2::after { content:attr(data-text);position:absolute;top:0;left:0;-webkit-text-stroke:2px var(--r);color:transparent; }
+.hero-title .l2::before { animation:g1 4s infinite;clip-path:polygon(0 0,100% 0,100% 35%,0 35%); }
+.hero-title .l2::after  { animation:g2 4s infinite;clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%); }
+@keyframes g1 { 0%,88%,100%{transform:translate(0)} 90%{transform:translate(-4px,2px)} 92%{transform:translate(4px,-2px)} 94%{transform:translate(0)} }
+@keyframes g2 { 0%,88%,100%{transform:translate(0)} 90%{transform:translate(4px,-2px)} 92%{transform:translate(-4px,2px)} 94%{transform:translate(0)} }
+
+.hero-desc { font-size:20px;line-height:1.5;color:#999;font-weight:400;max-width:420px;margin-top:32px;animation:fadeUp 0.6s ease 0.2s both; }
+.hero-desc strong { color:var(--w);font-weight:700; }
+
+.hero-form { margin-top:48px;animation:fadeUp 0.6s ease 0.3s both; }
+.form-label { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--dim);margin-bottom:12px;display:block; }
+.form-row { display:flex; }
+.inp { flex:1;background:transparent;border:1px solid #333;border-right:none;color:var(--w);font-family:'DM Mono',monospace;font-size:14px;padding:14px 18px;outline:none;transition:border-color 0.2s; }
+.inp:focus { border-color:var(--y); }
+.inp::placeholder { color:#333; }
+.btn { background:var(--y);color:var(--b);border:none;padding:14px 24px;font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.15s;white-space:nowrap;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%); }
+.btn:hover { background:var(--r);color:var(--w); }
+.form-note { margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:#333;letter-spacing:1px; }
+.ok { display:none;margin-top:12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--y);letter-spacing:2px; }
+
+/* HERO RIGHT — stats */
+.hero-right { display:flex;flex-direction:column; }
+.hero-stats { display:grid;grid-template-columns:1fr 1fr;flex:1; }
+.stat-box { padding:48px 40px;border-bottom:1px solid #1e1e1e;border-right:1px solid #1e1e1e;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;transition:background 0.3s; }
+.stat-box:nth-child(even) { border-right:none; }
+.stat-box:nth-child(3),.stat-box:nth-child(4) { border-bottom:none; }
+.stat-box::before { content:'';position:absolute;inset:0;background:var(--y);transform:scaleY(0);transform-origin:bottom;transition:transform 0.3s ease;z-index:0; }
+.stat-box:hover::before { transform:scaleY(1); }
+.stat-box:hover .sn { color:var(--b); }
+.stat-box:hover .sl { color:var(--b);opacity:0.7; }
+.sn { font-family:'Archivo Black',sans-serif;font-size:64px;line-height:1;color:var(--y);position:relative;z-index:1;transition:color 0.3s;letter-spacing:-2px; }
+.sl { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-top:8px;position:relative;z-index:1;transition:color 0.3s; }
+
+/* DIVIDER */
+.sdiv { padding:0 48px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:20px;height:64px; }
+.snum { font-family:'DM Mono',monospace;font-size:11px;color:#333;letter-spacing:2px; }
+.sline { flex:1;height:1px;background:#1e1e1e; }
+.stag { font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--dim); }
+
+/* HOW */
+.how { display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #1e1e1e; }
+.how-step { padding:64px 40px;border-right:1px solid #1e1e1e;position:relative;overflow:hidden;transition:all 0.3s; }
+.how-step:last-child { border-right:none; }
+.hsbg { position:absolute;bottom:0;right:0;font-family:'Archivo Black',sans-serif;font-size:180px;line-height:1;color:#111;pointer-events:none;z-index:0;transition:color 0.3s; }
+.how-step:hover .hsbg { color:rgba(255,229,0,0.06); }
+.hsi { position:relative;z-index:1; }
+.hsnum { font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--y);margin-bottom:32px;display:flex;align-items:center;gap:12px; }
+.hsnum::after { content:'';flex:1;height:1px;background:#222; }
+.hsicon { width:56px;height:56px;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:24px;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all 0.3s; }
+.how-step:hover .hsicon { border-color:var(--y);background:rgba(255,229,0,0.05); }
+.hstit { font-family:'Archivo Black',sans-serif;font-size:28px;letter-spacing:-0.5px;margin-bottom:16px;line-height:1.1; }
+.hsdesc { font-size:17px;color:#666;line-height:1.6;font-weight:400; }
+
+/* CATS */
+.cats-s { padding:80px 48px;border-bottom:1px solid #1e1e1e; }
+.cats-hdr { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px; }
+.cats-tit { font-family:'Archivo Black',sans-serif;font-size:clamp(48px,7vw,88px);letter-spacing:-2px;line-height:0.9; }
+.cats-tit em { font-style:normal;color:transparent;-webkit-text-stroke:1.5px var(--y); }
+.cats-note { font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--dim);max-width:200px;text-align:right;line-height:1.6; }
+.cats-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:2px; }
+.cat { background:#0f0f0f;border:1px solid #1a1a1a;padding:28px 20px;display:flex;flex-direction:column;gap:12px;cursor:none;transition:all 0.2s;position:relative;overflow:hidden; }
+.cat::after { content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--y);transform:scaleX(0);transform-origin:left;transition:transform 0.3s; }
+.cat:hover::after { transform:scaleX(1); }
+.cat:hover { background:#141414;transform:translateY(-4px); }
+.cat:hover .ci { transform:scale(1.2); }
+.ci { font-size:28px;transition:transform 0.2s; }
+.cn { font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase;line-height:1.2; }
+.cc { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim); }
+
+/* MOCKUP */
+.mock-s { display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #1e1e1e; }
+.mock-l { padding:80px 48px;border-right:1px solid #1e1e1e;display:flex;align-items:center;justify-content:center;background:#080808;position:relative;overflow:hidden; }
+.mock-l::before { content:'';position:absolute;inset:0;background-image:linear-gradient(#1a1a1a 1px,transparent 1px),linear-gradient(90deg,#1a1a1a 1px,transparent 1px);background-size:40px 40px;opacity:0.3; }
+.phone { width:260px;height:520px;background:#111;border:1.5px solid #2a2a2a;border-radius:36px;padding:20px 14px;position:relative;z-index:1;box-shadow:0 48px 80px rgba(0,0,0,0.7),0 0 60px rgba(255,229,0,0.04); }
+.phone::before { content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:72px;height:22px;background:#111;border-radius:0 0 14px 14px;border:1.5px solid #2a2a2a;border-top:none;z-index:10; }
+.pscr { height:100%;border-radius:26px;background:#0d0d0d;overflow:hidden;display:flex;flex-direction:column;padding:28px 12px 14px; }
+.plogl { text-align:center;margin-bottom:16px;font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:3px;color:var(--y); }
+.pqb { background:rgba(255,229,0,0.04);border:1px solid rgba(255,229,0,0.1);border-radius:12px;padding:14px;margin-bottom:12px; }
+.pql { font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--y);margin-bottom:6px; }
+.pqt { font-size:11px;line-height:1.5;font-weight:700;color:var(--w); }
+.popts { display:flex;flex-direction:column;gap:6px;flex:1; }
+.po { background:rgba(255,255,255,0.02);border:1px solid #1e1e1e;border-radius:8px;padding:10px 12px;font-size:10px;color:#666; }
+.po.c { background:rgba(255,229,0,0.08);border-color:rgba(255,229,0,0.3);color:var(--y); }
+.po.w { background:rgba(255,23,68,0.06);border-color:rgba(255,23,68,0.2);color:#ff1744; }
+.pbt { height:2px;background:#1a1a1a;border-radius:100px;margin-top:10px; }
+.pbf { height:100%;width:55%;background:linear-gradient(90deg,var(--y),var(--r));border-radius:100px;animation:barD 8s linear infinite; }
+@keyframes barD { from{width:100%} to{width:0%} }
+.psc { display:flex;justify-content:space-between;align-items:center;margin-top:10px; }
+.pp { display:flex;flex-direction:column;align-items:center;gap:2px; }
+.ppn { font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;color:#333; }
+.pps { font-family:'Archivo Black',sans-serif;font-size:22px;color:var(--w);letter-spacing:-1px; }
+.pps.ld { color:var(--y); }
+.pvs { font-family:'DM Mono',monospace;font-size:10px;color:#222; }
+
+.mock-r { padding:80px 48px;display:flex;flex-direction:column;justify-content:center; }
+.mtag { font-family:'DM Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--y);margin-bottom:24px; }
+.mtit { font-family:'Archivo Black',sans-serif;font-size:clamp(40px,5vw,68px);letter-spacing:-1px;line-height:0.95;margin-bottom:32px; }
+.mtit em { font-style:italic;color:transparent;-webkit-text-stroke:1.5px var(--r); }
+.mpts { display:flex;flex-direction:column;gap:20px; }
+.mpt { display:flex;align-items:flex-start;gap:16px; }
+.mdot { width:6px;height:6px;background:var(--y);flex-shrink:0;margin-top:8px;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+.mptxt { font-size:17px;color:#888;line-height:1.6; }
+.mptxt strong { color:var(--w);font-weight:700; }
+
+/* PRICING */
+.price-s { padding:80px 48px;border-bottom:1px solid #1e1e1e; }
+.price-tit { font-family:'Archivo Black',sans-serif;font-size:clamp(48px,7vw,88px);letter-spacing:-2px;line-height:0.9;margin-bottom:56px; }
+.price-tit span { color:var(--y); }
+.price-cards { display:grid;grid-template-columns:1fr 1fr;gap:2px;max-width:740px; }
+.pc { padding:48px;border:1px solid #1a1a1a;background:#0a0a0a;position:relative;overflow:hidden;transition:all 0.3s; }
+.pc:hover { border-color:#333; }
+.pc.feat { background:var(--y);color:var(--b);border-color:var(--y); }
+.pc-badge { position:absolute;top:0;right:0;background:var(--r);color:var(--w);font-family:'Archivo Black',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;padding:6px 12px;clip-path:polygon(10px 0,100% 0,100% 100%,0 100%); }
+.pc-tier { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:24px;color:inherit;opacity:0.5; }
+.pc.feat .pc-tier { opacity:0.7; }
+.pc-price { font-family:'Archivo Black',sans-serif;font-size:72px;letter-spacing:-3px;line-height:1;margin-bottom:4px; }
+.pc-period { font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;opacity:0.5;margin-bottom:32px; }
+.pc-feats { list-style:none;display:flex;flex-direction:column;gap:12px; }
+.pc-feat { display:flex;align-items:center;gap:12px;font-size:15px;color:inherit;opacity:0.8; }
+.pc-feat::before { content:'↗';font-size:12px;flex-shrink:0; }
+.pc-feat.no { opacity:0.25; }
+.pc-feat.no::before { content:'—'; }
+.pc.feat .pc-feat { opacity:1; }
+.pc.feat .pc-feat.no { opacity:0.35; }
+
+/* CTA */
+.cta-s { padding:120px 48px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid #1e1e1e; }
+.ctabg { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;font-size:280px;font-style:italic;color:#0f0f0f;letter-spacing:-10px;pointer-events:none;user-select:none;white-space:nowrap; }
+.cta-lbl { font-family:'DM Mono',monospace;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--y);margin-bottom:24px;position:relative; }
+.cta-tit { font-family:'Archivo Black',sans-serif;font-size:clamp(64px,11vw,148px);letter-spacing:-4px;line-height:0.85;position:relative;margin-bottom:16px; }
+.cta-tit .ol { display:block;color:transparent;-webkit-text-stroke:2px var(--w); }
+.cta-sub { font-size:18px;color:#555;font-weight:400;margin-bottom:48px;position:relative; }
+.cta-sub em { font-style:normal;color:var(--y); }
+.cta-form { display:flex;gap:0;max-width:460px;margin:0 auto;position:relative; }
+.cta-form .inp { border-right:none; }
+
+/* FOOTER */
+footer { padding:32px 48px;display:flex;justify-content:space-between;align-items:center;background:#050505; }
+.flogo { font-family:'Archivo Black',sans-serif;font-size:18px;letter-spacing:4px;color:var(--y); }
+.fr { display:flex;gap:32px;align-items:center; }
+.fnote { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:#222; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
+.reveal { opacity:0;transform:translateY(40px);transition:opacity 0.7s ease,transform 0.7s ease; }
+.reveal.up { opacity:1;transform:translateY(0); }
+
+/* MOBILE */
+@media(max-width:900px){
+  nav{padding:20px 24px;}
+  .hero{grid-template-columns:1fr;}
+  .hero-right{border-top:1px solid #1e1e1e;}
+  .hero-left{padding:56px 24px;}
+  .hero-stats{grid-template-columns:1fr 1fr;}
+  .how{grid-template-columns:1fr;}
+  .how-step{border-right:none;border-bottom:1px solid #1e1e1e;}
+  .cats-grid{grid-template-columns:repeat(3,1fr);}
+  .cats-hdr{flex-direction:column;align-items:flex-start;gap:16px;}
+  .cats-note{text-align:left;}
+  .mock-s{grid-template-columns:1fr;}
+  .mock-l,.mock-r{padding:60px 24px;}
+  .price-cards{grid-template-columns:1fr;max-width:440px;}
+  .price-s,.cats-s,.cta-s{padding:60px 24px;}
+  .cta-bg{font-size:120px;}
+  footer{padding:24px;flex-direction:column;gap:16px;text-align:center;}
+  .form-row{flex-direction:column;}
+  .inp{border-right:1px solid #333 !important;}
+  .btn{clip-path:none;}
+  .cta-form{flex-direction:column;padding:0 24px;}
+  .sdiv{padding:0 24px;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-inner">KIM DAHA VİRAL? &nbsp;✦&nbsp; GÜNDEM BİLGİSİ &nbsp;✦&nbsp; ARKADAŞINI YEN &nbsp;✦&nbsp; GERÇEK ZAMANLI YARIŞMA &nbsp;✦&nbsp; TÜRKİYE'NİN VİRAL OYUNU &nbsp;✦&nbsp; KIM DAHA VİRAL? &nbsp;✦&nbsp; GÜNDEM BİLGİSİ &nbsp;✦&nbsp; ARKADAŞINI YEN &nbsp;✦&nbsp; GERÇEK ZAMANLI YARIŞMA &nbsp;✦&nbsp; TÜRKİYE'NİN VİRAL OYUNU &nbsp;✦&nbsp;</span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">KDV</div>
+  <div class="nav-right">
+    <a href="#nasil" class="nav-link">Nasıl Çalışır</a>
+    <a href="#fiyat" class="nav-link">Fiyat</a>
+    <a href="#kayit" class="nav-cta">Kaydol →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div>
+      <div class="hero-eyebrow">/ 001 — Türkiye'nin Viral Bilgi Yarışması</div>
+      <h1 class="hero-title">
+        <span class="l1">KIM</span>
+        <span class="l2" data-text="DAHA VİRAL?">DAHA VİRAL?</span>
+      </h1>
+      <p class="hero-desc"><strong>Arkadaşını çağır.</strong> 10 soru. Gerçek zamanlı. Gündemin nabzını tut ya da ez geç. Türkiye'de bir ilk.</p>
+    </div>
+    <div class="hero-form">
+      <span class="form-label">// erken erişim listesi</span>
+      <div class="form-row">
+        <input type="email" class="inp" placeholder="eposta@gmail.com" id="heroEmail">
+        <button class="btn" onclick="signup('heroEmail','heroOk')">İLK OL →</button>
+      </div>
+      <div class="ok" id="heroOk">✦ Listeye alındın.</div>
+      <p class="form-note">// spam yok. istersen çıkarsın.</p>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stats">
+      <div class="stat-box"><div class="sn" id="cnt">247</div><div class="sl">Kayıt olan</div></div>
+      <div class="stat-box"><div class="sn">10</div><div class="sl">Soru / maç</div></div>
+      <div class="stat-box"><div class="sn">∞</div><div class="sl">Gündem sorusu</div></div>
+      <div class="stat-box"><div class="sn">0₺</div><div class="sl">Başlamak için</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIV -->
+<div class="sdiv"><span class="snum">002</span><div class="sline"></div><span class="stag">Nasıl Çalışır</span><div class="sline"></div></div>
+
+<!-- HOW -->
+<section class="how" id="nasil">
+  <div class="how-step reveal">
+    <div class="hsbg">01</div>
+    <div class="hsi">
+      <div class="hsnum">ADIM 01</div>
+      <div class="hsicon">🔗</div>
+      <h3 class="hstit">Link at,<br>maç başlasın</h3>
+      <p class="hsdesc">Arkadaşına bir link atıyorsun. Tıkladı mı, kayıt falan gerek yok — direkt maça giriyor. 10 saniye içinde hazır.</p>
+    </div>
+  </div>
+  <div class="how-step reveal">
+    <div class="hsbg">02</div>
+    <div class="hsi">
+      <div class="hsnum">ADIM 02</div>
+      <div class="hsicon">⚡</div>
+      <h3 class="hstit">Aynı anda,<br>aynı sorular</h3>
+      <p class="hsdesc">10 soru, ikisi aynı anda görür. Hız da sayılır, doğruluk da. Her sorudan sonra gerilim tırmanıyor.</p>
+    </div>
+  </div>
+  <div class="how-step reveal">
+    <div class="hsbg">03</div>
+    <div class="hsi">
+      <div class="hsnum">ADIM 03</div>
+      <div class="hsicon">🔥</div>
+      <h3 class="hstit">Sonucu at,<br>kışkırt</h3>
+      <p class="hsdesc">"Seni 80 puanla geçtim 😂" — sonucunu WhatsApp'a at. Karşı taraf kabul edemez. Rematch zorunlu olur.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DIV -->
+<div class="sdiv"><span class="snum">003</span><div class="sline"></div><span class="stag">Kategoriler</span><div class="sline"></div></div>
+
+<!-- CATEGORIES -->
+<section class="cats-s">
+  <div class="cats-hdr">
+    <h2 class="cats-tit reveal">HER GÜN<br><em>YENİ</em><br>GÜNDEM</h2>
+    <p class="cats-note reveal">Sorular her sabah Türkiye gündemine göre otomatik yenileniyor.</p>
+  </div>
+  <div class="cats-grid">
+    <div class="cat reveal"><span class="ci">🔥</span><span class="cn">Gündelik<br>Viral</span><span class="cc">// Her gün yeni</span></div>
+    <div class="cat reveal"><span class="ci">⚽</span><span class="cn">Spor &<br>Transfer</span><span class="cc">// Haftalık günceli</span></div>
+    <div class="cat reveal"><span class="ci">🎬</span><span class="cn">Dizi &<br>Film</span><span class="cc">// Türkçe + Global</span></div>
+    <div class="cat reveal"><span class="ci">🎵</span><span class="cn">Müzik &<br>Chart</span><span class="cc">// Spotify güncel</span></div>
+    <div class="cat reveal"><span class="ci">📱</span><span class="cn">Sosyal<br>Medya</span><span class="cc">// TikTok, IG, X</span></div>
+    <div class="cat reveal"><span class="ci">🌍</span><span class="cn">Dünya<br>Gündemi</span><span class="cc">// Global haberler</span></div>
+  </div>
+</section>
+
+<!-- DIV -->
+<div class="sdiv"><span class="snum">004</span><div class="sline"></div><span class="stag">Arayüz</span><div class="sline"></div></div>
+
+<!-- MOCKUP -->
+<section class="mock-s">
+  <div class="mock-l">
+    <div class="phone reveal">
+      <div class="pscr">
+        <div class="plogl">KDV</div>
+        <div class="pqb"><div class="pql">SORU 4 / 10</div><div class="pqt">Bu hafta hangi Türk dizisi en çok izlendi?</div></div>
+        <div class="popts">
+          <div class="po c">✓ Çukur — Yeni Sezon</div>
+          <div class="po w">✗ Diriliş Ertuğrul</div>
+          <div class="po">Barbaroslar</div>
+          <div class="po">Kuzey Yıldızı</div>
+        </div>
+        <div class="pbt"><div class="pbf"></div></div>
+        <div class="psc">
+          <div class="pp"><span class="ppn">SEN</span><span class="pps ld">420</span></div>
+          <span class="pvs">VS</span>
+          <div class="pp"><span class="ppn">AHMET</span><span class="pps">310</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mock-r">
+    <div class="mtag">// arayüz</div>
+    <h2 class="mtit reveal">TEMİZ.<br><em>HIZLI.</em><br>ACIMAZ.</h2>
+    <div class="mpts">
+      <div class="mpt reveal"><div class="mdot"></div><p class="mptxt"><strong>Saniyeler önemli.</strong> Tasarım bunu biliyor. Dikkat dağıtmak yok.</p></div>
+      <div class="mpt reveal"><div class="mdot"></div><p class="mptxt"><strong>Canlı skor.</strong> Karşındakinin puanı gerçek zamanlı görünüyor.</p></div>
+      <div class="mpt reveal"><div class="mdot"></div><p class="mptxt"><strong>Sonuç ekranı</strong> tek tıkla WhatsApp'a gidiyor.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIV -->
+<div class="sdiv" id="fiyat"><span class="snum">005</span><div class="sline"></div><span class="stag">Fiyatlandırma</span><div class="sline"></div></div>
+
+<!-- PRICING -->
+<section class="price-s">
+  <h2 class="price-tit reveal">NET<br><span>FİYAT</span></h2>
+  <div class="price-cards">
+    <div class="pc reveal">
+      <div class="pc-tier">Ücretsiz</div>
+      <div class="pc-price">₺0</div>
+      <div class="pc-period">/ sonsuza kadar</div>
+      <ul class="pc-feats">
+        <li class="pc-feat">Günde 5 maç</li>
+        <li class="pc-feat">Tüm kategoriler</li>
+        <li class="pc-feat">Arkadaşını çağır</li>
+        <li class="pc-feat no">Sınırsız maç</li>
+        <li class="pc-feat no">Reklamsız</li>
+        <li class="pc-feat no">Özel paketler</li>
+      </ul>
+    </div>
+    <div class="pc feat reveal">
+      <div class="pc-badge">Popüler</div>
+      <div class="pc-tier">Pro</div>
+      <div class="pc-price">₺39</div>
+      <div class="pc-period">/ aylık</div>
+      <ul class="pc-feats">
+        <li class="pc-feat">Sınırsız maç</li>
+        <li class="pc-feat">Reklamsız</li>
+        <li class="pc-feat">Tüm kategoriler</li>
+        <li class="pc-feat">Özel paketler</li>
+        <li class="pc-feat">Detaylı istatistik</li>
+        <li class="pc-feat">Erken soru erişimi</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-s" id="kayit">
+  <div class="ctabg">VİRAL</div>
+  <div class="cta-lbl">// ilk 500 — ömür boyu pro bedava</div>
+  <h2 class="cta-tit">
+    <span style="color:var(--w)">HAZIR</span>
+    <span class="ol">MISIN?</span>
+  </h2>
+  <p class="cta-sub">Listeye gir. Açılışta <em>ilk sen</em> oyna.</p>
+  <div class="cta-form">
+    <input type="email" class="inp" placeholder="eposta@gmail.com" id="ctaEmail">
+    <button class="btn" onclick="signup('ctaEmail','ctaOk')" style="clip-path:none;">KAYDOL →</button>
+  </div>
+  <div class="ok" id="ctaOk" style="margin-top:14px;">✦ Listeye alındın. Görüşürüz.</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="flogo">KDV</div>
+  <div class="fr">
+    <span class="fnote">© 2025 KIM DAHA VİRAL</span>
+    <span class="fnote">// TÜRKİYE</span>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur = document.getElementById('cur');
+document.addEventListener('mousemove', e => {
+  cur.style.left = (e.clientX - 10) + 'px';
+  cur.style.top = (e.clientY - 10) + 'px';
+});
+document.querySelectorAll('a,button,input,.cat,.stat-box,.how-step,.pc').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.style.transform = 'scale(2) rotate(45deg)');
+  el.addEventListener('mouseleave', () => cur.style.transform = 'scale(1) rotate(0deg)');
+});
+
+// REVEAL
+const ro = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) setTimeout(() => e.target.classList.add('up'), i * 70);
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// SIGNUP
+let count = 247;
+function signup(inputId, okId) {
+  const inp = document.getElementById(inputId);
+  const ok = document.getElementById(okId);
+  if (!inp.value.trim() || !inp.value.includes('@')) {
+    inp.style.borderColor = 'rgba(255,23,68,0.6)';
+    inp.placeholder = 'Geçerli email lazım';
+    setTimeout(() => { inp.style.borderColor=''; inp.placeholder='eposta@gmail.com'; }, 2000);
+    return;
+  }
+  count++;
+  document.getElementById('cnt').textContent = count;
+  inp.value = '';
+  ok.style.display = 'block';
+  setTimeout(() => ok.style.display='none', 4000);
+}
+document.querySelectorAll('.inp').forEach(inp => {
+  inp.addEventListener('keypress', e => {
+    if (e.key !== 'Enter') return;
+    signup(inp.id, inp.id === 'heroEmail' ? 'heroOk' : 'ctaOk');
+  });
+});
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior:'smooth' });
+  });
+});
+</script>
+</body>
+</html>
