@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIM DAHA VİRAL? — Oyna</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--y:#FFE500;--b:#080808;--r:#FF1744;--w:#F5F5F0;--dim:#444;--border:#1e1e1e}
+html,body{height:100%}
+body{background:var(--b);color:var(--w);font-family:'Barlow Condensed',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;overflow-x:hidden;cursor:none}
+#cur{width:14px;height:14px;background:var(--y);position:fixed;z-index:9999;pointer-events:none;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);transition:transform 0.1s}
+.ticker{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--y);color:var(--b);padding:8px 0;overflow:hidden;white-space:nowrap;font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase}
+.ticker-inner{display:inline-block;animation:tick 16s linear infinite}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:100vh;padding:80px 24px 40px}
+.screen.active{display:flex}
+.logo{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,5vw,38px);letter-spacing:4px;color:var(--y);margin-bottom:6px;text-align:center}
+.logo-sub{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim);margin-bottom:36px;text-align:center}
+.card{background:#0e0e0e;border:1px solid var(--border);padding:36px;width:100%;max-width:420px;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--y),var(--r))}
+.lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:10px;display:block}
+.inp{width:100%;background:transparent;border:1px solid #222;color:var(--w);font-family:'DM Mono',monospace;font-size:15px;padding:14px 16px;outline:none;transition:border-color 0.2s;margin-bottom:16px}
+.inp:focus{border-color:var(--y)}
+.inp::placeholder{color:#333}
+.btn{width:100%;background:var(--y);color:var(--b);border:none;padding:16px;font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.15s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.btn:hover{background:var(--r);color:var(--w)}
+.btn-o{width:100%;background:transparent;color:var(--w);border:1px solid #333;padding:14px;font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.15s;margin-top:10px}
+.btn-o:hover{border-color:var(--y);color:var(--y)}
+.div{display:flex;align-items:center;gap:16px;margin:20px 0}
+.div span{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:2px}
+.div::before,.div::after{content:'';flex:1;height:1px;background:#1e1e1e}
+/* WAIT */
+.wbox{text-align:center;padding:36px 20px;width:100%;max-width:420px}
+.wtit{font-family:'Archivo Black',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:6px}
+.wsub{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:24px}
+.lnkbox{background:#111;border:1px solid #222;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.lnktxt{font-family:'DM Mono',monospace;font-size:11px;color:#888;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpybtn{background:var(--y);color:var(--b);border:none;padding:6px 12px;font-family:'Archivo Black',sans-serif;font-size:10px;letter-spacing:2px;cursor:none;flex-shrink:0;transition:all 0.15s}
+.cpybtn:hover{background:var(--r);color:var(--w)}
+.cpynote{font-family:'DM Mono',monospace;font-size:10px;color:#333;letter-spacing:1px;margin-bottom:24px}
+.prow{display:flex;gap:2px;margin-bottom:16px}
+.pslot{flex:1;padding:14px;border:1px solid #1a1a1a;display:flex;flex-direction:column;gap:5px;align-items:center;transition:all 0.3s}
+.pslot.on{border-color:rgba(255,229,0,0.2);background:rgba(255,229,0,0.03)}
+.psico{font-size:18px}
+.psnm{font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:1px}
+.psst{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim)}
+.psst.y{color:var(--y)}
+.pulse{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+/* COUNTDOWN */
+.cnum{font-family:'Archivo Black',sans-serif;font-size:clamp(100px,22vw,180px);line-height:1;letter-spacing:-4px;color:var(--y);animation:cpop 0.4s ease}
+@keyframes cpop{from{transform:scale(1.4);opacity:0}to{transform:scale(1);opacity:1}}
+.clbl{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:4px;color:var(--dim);margin-top:8px}
+/* GAME */
+.gwrap{max-width:540px;margin:0 auto;width:100%}
+.ghdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.qcnt{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim)}
+.twrap{display:flex;align-items:center;gap:10px}
+.tnum{font-family:'Archivo Black',sans-serif;font-size:28px;color:var(--y);letter-spacing:-1px;min-width:30px;text-align:center}
+.tbar-w{width:80px;height:3px;background:#1e1e1e;border-radius:100px;overflow:hidden}
+.tbar{height:100%;background:linear-gradient(90deg,var(--y),var(--r));border-radius:100px}
+.srow{display:flex;gap:2px;margin-bottom:20px}
+.sbox{flex:1;padding:12px 16px;border:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;transition:border-color 0.3s}
+.sbox.ld{border-color:rgba(255,229,0,0.3)}
+.snm{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.ssc{font-family:'Archivo Black',sans-serif;font-size:28px;letter-spacing:-1px;transition:color 0.3s}
+.ssc.g{color:var(--y)}
+.vsbl{display:flex;align-items:center;padding:0 10px;font-family:'DM Mono',monospace;font-size:10px;color:#222}
+.qbox{background:#0e0e0e;border:1px solid var(--border);padding:24px;margin-bottom:14px;position:relative}
+.qbox::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--y),var(--r))}
+.qtag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--y);margin-bottom:8px;display:block}
+.qtxt{font-size:clamp(16px,3vw,21px);font-weight:700;line-height:1.4;color:var(--w)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.opt{background:#0e0e0e;border:1px solid #1a1a1a;padding:16px 14px;font-size:15px;color:#aaa;cursor:none;transition:all 0.2s;text-align:left;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.5px}
+.opt:hover:not(:disabled){border-color:rgba(255,229,0,0.3);color:var(--w);background:#111}
+.opt.correct{background:rgba(255,229,0,0.1);border-color:rgba(255,229,0,0.5);color:var(--y)}
+.opt.wrong{background:rgba(255,23,68,0.08);border-color:rgba(255,23,68,0.3);color:var(--r)}
+.opt.reveal{background:rgba(255,229,0,0.03);border-color:rgba(255,229,0,0.15);color:rgba(255,229,0,0.4)}
+.opt:disabled{cursor:not-allowed}
+.fbbox{text-align:center;padding:14px;margin-top:10px}
+.fbtxt{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:2px}
+.fbpts{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--dim);margin-top:4px}
+.oppst{text-align:center;padding:10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);border:1px solid #111;margin-top:8px}
+/* RESULT */
+.rwrap{max-width:460px;margin:0 auto;width:100%;text-align:center}
+.rcrown{font-size:52px;margin-bottom:10px;display:block}
+.rtit{font-family:'Archivo Black',sans-serif;font-size:clamp(40px,9vw,68px);letter-spacing:-2px;line-height:0.9;margin-bottom:6px}
+.rout{color:transparent;-webkit-text-stroke:2px var(--y);display:block}
+.rsub{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim);margin-bottom:32px}
+.rscores{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:24px}
+.rsbox{padding:24px 18px;border:1px solid #1a1a1a}
+.rsbox.win{border-color:rgba(255,229,0,0.3);background:rgba(255,229,0,0.03)}
+.rsnm{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:8px}
+.rssc{font-family:'Archivo Black',sans-serif;font-size:48px;letter-spacing:-2px;line-height:1}
+.rssc.g{color:var(--y)}
+.rslbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:4px}
+.shbtn{width:100%;background:var(--y);color:var(--b);border:none;padding:16px;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.15s;margin-bottom:10px;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.shbtn:hover{background:var(--r);color:var(--w)}
+.rebtn{width:100%;background:transparent;color:#888;border:1px solid #222;padding:13px;font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.15s}
+.rebtn:hover{border-color:var(--y);color:var(--y)}
+.errmsg{color:var(--r);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;margin-top:6px;display:none}
+@media(max-width:480px){.opts{grid-template-columns:1fr}.card{padding:24px 18px}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div class="ticker"><span class="ticker-inner">KIM DAHA VİRAL? &nbsp;✦&nbsp; GÜNDEM BİLGİSİ &nbsp;✦&nbsp; ARKADAŞINI YEN &nbsp;✦&nbsp; GERÇEK ZAMANLI YARIŞMA &nbsp;✦&nbsp; KIM DAHA VİRAL? &nbsp;✦&nbsp; GÜNDEM BİLGİSİ &nbsp;✦&nbsp; ARKADAŞINI YEN &nbsp;✦&nbsp; GERÇEK ZAMANLI YARIŞMA &nbsp;✦&nbsp;</span></div>
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="logo">KIM DAHA VİRAL?</div>
+  <div class="logo-sub">// gerçek zamanlı bilgi yarışması</div>
+  <div class="card">
+    <span class="lbl">// adını gir</span>
+    <input type="text" class="inp" id="inp-name" placeholder="Adın ne?" maxlength="16">
+    <div class="errmsg" id="err-name">İsim lazım bro</div>
+    <button class="btn" onclick="createRoom()">YENİ MAÇ BAŞLAT →</button>
+    <div class="div"><span>YA DA</span></div>
+    <span class="lbl">// arkadaşının linki varsa</span>
+    <input type="text" class="inp" id="inp-code" placeholder="Oda kodu (6 hane)">
+    <button class="btn-o" onclick="joinRoom()">ODAYA GİR →</button>
+  </div>
+</div>
+
+<!-- WAIT -->
+<div class="screen" id="s-wait">
+  <div class="wbox">
+    <div class="logo">KIM DAHA VİRAL?</div>
+    <div class="wtit">ARKADAŞINI BEKLE</div>
+    <div class="wsub">// bu linki at, maç başlasın</div>
+    <div class="lnkbox">
+      <span class="lnktxt" id="share-link">—</span>
+      <button class="cpybtn" onclick="copyLink()">KOPYALA</button>
+    </div>
+    <div class="cpynote">// whatsapp'a at, tıklasın, hazır</div>
+    <div class="prow">
+      <div class="pslot on" id="slot1"><span class="psico">👤</span><span class="psnm" id="s1nm">—</span><span class="psst y">✦ hazır</span></div>
+      <div class="pslot" id="slot2"><span class="psico pulse">⏳</span><span class="psnm" id="s2nm">Bekleniyor...</span><span class="psst" id="s2st">// katılmadı</span></div>
+    </div>
+    <div class="wsub pulse" id="wmsg">// rakip bekleniyor</div>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="screen" id="s-count">
+  <div class="logo" style="margin-bottom:20px">KIM DAHA VİRAL?</div>
+  <div class="cnum" id="cnum">3</div>
+  <div class="clbl">// hazır ol</div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="s-game">
+  <div class="gwrap">
+    <div class="ghdr">
+      <span class="qcnt" id="qcnt">SORU 1 / 2</span>
+      <div class="twrap">
+        <div class="tbar-w"><div class="tbar" id="tbar" style="width:100%"></div></div>
+        <span class="tnum" id="tnum">15</span>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="sbox" id="mybox"><span class="snm" id="mynm">SEN</span><span class="ssc" id="mysc">0</span></div>
+      <div class="vsbl">VS</div>
+      <div class="sbox" id="oppbox"><span class="snm" id="oppnm">RAKİP</span><span class="ssc" id="oppsc">0</span></div>
+    </div>
+    <div class="qbox"><span class="qtag" id="qtag">SORU</span><div class="qtxt" id="qtxt">Yükleniyor...</div></div>
+    <div class="opts" id="opts"></div>
+    <div class="fbbox" id="fb" style="display:none"><div class="fbtxt" id="fbtxt"></div><div class="fbpts" id="fbpts"></div></div>
+    <div class="oppst" id="oppst">// rakip düşünüyor...</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="s-result">
+  <div class="rwrap">
+    <span class="rcrown" id="rcrown">🏆</span>
+    <h2 class="rtit"><span id="rl1"></span><span class="rout" id="rl2"></span></h2>
+    <div class="rsub" id="rsub"></div>
+    <div class="rscores">
+      <div class="rsbox" id="rsme"><div class="rsnm" id="rsmynm">SEN</div><div class="rssc" id="rsmysc">0</div><div class="rslbl">puan</div></div>
+      <div class="rsbox" id="rsopp"><div class="rsnm" id="rsoppnm">RAKİP</div><div class="rssc" id="rsoppsc">0</div><div class="rslbl">puan</div></div>
+    </div>
+    <button class="shbtn" onclick="shareResult()">📤 WHATSAPP'A AT</button>
+    <button class="rebtn" onclick="location.href=location.origin+location.pathname">YENİDEN OYNA →</button>
+  </div>
+</div>
+
+<script>
+const SURL='https://vigdfysiunftjvpeypzt.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZ2RmeXNpdW5mdGp2cGV5cHp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NzIwOTMsImV4cCI6MjA4NzU0ODA5M30.UnlX9J6VYZ2cAAYrXRb5gilrqHkFsCxYrRTCLnmIdZY';
+const sb=supabase.createClient(SURL,SKEY);
+
+const QS=[
+  {tag:'⚽ SPOR',txt:"Galatasaray, Şampiyonlar Ligi play-off ilk maçında Juventus'u kaç golle mağlup etti?",opts:['5-2','3-1','4-0','2-1'],correct:0},
+  {tag:'🔥 GÜNDEM',txt:"Oyuncu Sıla Türkoğlu hangi ürün için 15 milyon TL'ye reklam filmi çekti?",opts:['Diş macunu','Şampuan','Cilt bakım','Parfüm'],correct:0}
+];
+const MAXTIME=15;
+
+// --- state
+let roomId=null,mySlot=null,myName='',oppName='';
+let myScore=0,oppScore=0,curQ=0;
+let timerIv=null,pollIv=null,timeLeft=MAXTIME;
+let iAns=false,oppAns=false,resultShown=false;
+let advanceLock=false;
+
+// --- cursor
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{cur.style.left=(e.clientX-7)+'px';cur.style.top=(e.clientY-7)+'px'});
+document.querySelectorAll('button,input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.style.transform='scale(2) rotate(45deg)');
+  el.addEventListener('mouseleave',()=>cur.style.transform='scale(1) rotate(0deg)');
+});
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s-'+id).classList.add('active')}
+function genId(){return Math.random().toString(36).substring(2,8).toUpperCase()}
+
+// --- url check
+window.addEventListener('load',()=>{
+  const p=new URLSearchParams(window.location.search);
+  const r=p.get('room');
+  if(r) document.getElementById('inp-code').value=r;
+});
+
+// =====================
+// CREATE ROOM
+// =====================
+async function createRoom(){
+  const name=document.getElementById('inp-name').value.trim();
+  if(!name){showErr();return}
+  myName=name; mySlot='player1'; roomId=genId();
+
+  const {error}=await sb.from('rooms').insert({
+    id:roomId,
+    player1_name:name,
+    player2_name:null,
+    player1_score:0,
+    player2_score:0,
+    player1_q:-1,
+    player2_q:-1,
+    status:'waiting'
+  });
+  if(error){alert('Hata: '+error.message);return}
+
+  document.getElementById('share-link').textContent=location.origin+location.pathname+'?room='+roomId;
+  document.getElementById('s1nm').textContent=name;
+  show('wait');
+  startPolling();
+}
+
+// =====================
+// JOIN ROOM
+// =====================
+async function joinRoom(){
+  const name=document.getElementById('inp-name').value.trim();
+  const code=(document.getElementById('inp-code').value.trim()).toUpperCase();
+  if(!name){showErr();return}
+  if(!code){alert('Oda kodu lazım');return}
+
+  const {data,error}=await sb.from('rooms').select('*').eq('id',code).single();
+  if(error||!data){alert('Oda bulunamadı: '+code);return}
+  if(data.player2_name){alert('Bu oda dolu!');return}
+
+  myName=name; mySlot='player2'; roomId=code; oppName=data.player1_name;
+
+  // update db: player2 joined
+  const {error:e2}=await sb.from('rooms').update({
+    player2_name:name,
+    status:'starting'
+  }).eq('id',roomId);
+  if(e2){alert('Güncelleme hatası: '+e2.message);return}
+
+  // show wait screen briefly
+  document.getElementById('share-link').textContent=location.origin+location.pathname+'?room='+roomId;
+  document.getElementById('s1nm').textContent=oppName;
+  document.getElementById('slot2').classList.add('on');
+  document.getElementById('s2nm').textContent=name;
+  document.getElementById('s2st').textContent='✦ katıldı';
+  document.getElementById('s2st').classList.add('y');
+  document.getElementById('wmsg').textContent='// rakip bulundu! başlıyor...';
+  show('wait');
+
+  // player2 starts countdown immediately
+  setTimeout(()=>startCountdown(),1500);
+  startPolling();
+}
+
+// =====================
+// POLLING — ana senkronizasyon mekanizması
+// =====================
+function startPolling(){
+  clearInterval(pollIv);
+  pollIv=setInterval(poll,1000);
+}
+
+function stopPolling(){
+  clearInterval(pollIv);
+  pollIv=null;
+}
+
+async function poll(){
+  if(!roomId) return;
+  const {data,error}=await sb.from('rooms').select('*').eq('id',roomId).single();
+  if(error||!data) return;
+  handleState(data);
+}
+
+// =====================
+// STATE MACHINE — tek merkezi fonksiyon
+// =====================
+const S=window.location.href; // screen guard
+let lastStatus='';
+let gameStarted=false;
+
+function handleState(room){
+  // --- waiting screen: player2 joined
+  if(mySlot==='player1' && room.status==='starting' && room.player2_name && !gameStarted){
+    oppName=room.player2_name;
+    document.getElementById('slot2').classList.add('on');
+    document.getElementById('s2nm').textContent=oppName;
+    document.getElementById('s2st').textContent='✦ katıldı';
+    document.getElementById('s2st').classList.add('y');
+    document.getElementById('wmsg').textContent='// rakip bulundu! başlıyor...';
+    gameStarted=true;
+    setTimeout(()=>startCountdown(),1500);
+    return;
+  }
+
+  // --- game screen: sync opponent score & question progress
+  const currentScreen=document.querySelector('.screen.active').id;
+  if(currentScreen==='s-game'){
+    // sync opp score
+    const dbOppScore=mySlot==='player1'?room.player2_score:room.player1_score;
+    if(dbOppScore!==oppScore){
+      oppScore=dbOppScore;
+      document.getElementById('oppsc').textContent=oppScore;
+      updateLeader();
+    }
+
+    // detect opp answered current question
+    const dbOppQ=mySlot==='player1'?room.player2_q:room.player1_q;
+    if(dbOppQ>=curQ && !oppAns){
+      oppAns=true;
+      document.getElementById('oppst').textContent='// rakip cevapladı ✦';
+      if(iAns) tryAdvance();
+    }
+
+    // game done
+    if(room.status==='done' && !resultShown){
+      resultShown=true;
+      stopPolling();
+      const p1s=room.player1_score||0;
+      const p2s=room.player2_score||0;
+      myScore=mySlot==='player1'?p1s:p2s;
+      oppScore=mySlot==='player1'?p2s:p1s;
+      setTimeout(()=>showResult(),1000);
+    }
+  }
+}
+
+// =====================
+// COUNTDOWN
+// =====================
+function startCountdown(){
+  stopPolling(); // pause poll during countdown
+  show('count');
+  let n=3;
+  document.getElementById('cnum').textContent=n;
+  const iv=setInterval(()=>{
+    n--;
+    if(n<=0){clearInterval(iv);startGame();}
+    else document.getElementById('cnum').textContent=n;
+  },1000);
+}
+
+// =====================
+// GAME
+// =====================
+function startGame(){
+  curQ=0; myScore=0; oppScore=0;
+  iAns=false; oppAns=false; advanceLock=false; resultShown=false;
+  document.getElementById('mynm').textContent=myName.toUpperCase();
+  document.getElementById('oppnm').textContent=(oppName||'RAKİP').toUpperCase();
+  show('game');
+  startPolling(); // resume polling
+  loadQ();
+}
+
+function loadQ(){
+  const q=QS[curQ];
+  iAns=false; oppAns=false; advanceLock=false;
+  timeLeft=MAXTIME;
+
+  document.getElementById('qcnt').textContent='SORU '+(curQ+1)+' / '+QS.length;
+  document.getElementById('qtag').textContent=q.tag;
+  document.getElementById('qtxt').textContent=q.txt;
+  document.getElementById('fb').style.display='none';
+  document.getElementById('oppst').textContent='// rakip düşünüyor...';
+  document.getElementById('mysc').textContent=myScore;
+  document.getElementById('oppsc').textContent=oppScore;
+
+  // reset timer bar instantly (no transition)
+  const bar=document.getElementById('tbar');
+  bar.style.transition='none';
+  bar.style.width='100%';
+  document.getElementById('tnum').textContent=MAXTIME;
+
+  // render options
+  const grid=document.getElementById('opts');
+  grid.innerHTML='';
+  q.opts.forEach((txt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=txt;
+    b.onclick=()=>answer(i,b);
+    grid.appendChild(b);
+  });
+
+  // start timer
+  clearInterval(timerIv);
+  setTimeout(()=>{
+    bar.style.transition='width 1s linear';
+    bar.style.width=((MAXTIME-1)/MAXTIME*100)+'%';
+  },50);
+  timerIv=setInterval(()=>{
+    timeLeft--;
+    document.getElementById('tnum').textContent=timeLeft;
+    bar.style.width=(timeLeft/MAXTIME*100)+'%';
+    if(timeLeft<=0){clearInterval(timerIv);if(!iAns)answer(-1,null);}
+  },1000);
+}
+
+async function answer(idx,btn){
+  if(iAns) return;
+  iAns=true;
+  clearInterval(timerIv);
+
+  const q=QS[curQ];
+  const ok=idx===q.correct;
+  const pts=ok?Math.max(100,Math.round((timeLeft/MAXTIME)*500)):0;
+  myScore+=pts;
+
+  // visuals
+  document.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+  if(idx>=0&&btn) btn.classList.add(ok?'correct':'wrong');
+  document.querySelectorAll('.opt')[q.correct].classList.add(ok?'correct':'reveal');
+
+  const fb=document.getElementById('fb');
+  fb.style.display='block';
+  const ft=document.getElementById('fbtxt');
+  ft.textContent=ok?'✦ DOĞRU!':idx===-1?'⏰ SÜRE BİTTİ':'✗ YANLIŞ';
+  ft.style.color=ok?'var(--y)':'var(--r)';
+  document.getElementById('fbpts').textContent=ok?'+'+pts+' PUAN':'+0 PUAN';
+  document.getElementById('mysc').textContent=myScore;
+  updateLeader();
+
+  // write to db
+  const scoreField=mySlot==='player1'?'player1_score':'player2_score';
+  const qField=mySlot==='player1'?'player1_q':'player2_q';
+  await sb.from('rooms').update({
+    [scoreField]:myScore,
+    [qField]:curQ
+  }).eq('id',roomId);
+
+  if(oppAns) tryAdvance();
+}
+
+function tryAdvance(){
+  if(advanceLock) return;
+  advanceLock=true;
+  const next=curQ+1;
+  if(next>=QS.length){
+    // both done — mark game over (only p1 writes to avoid race)
+    if(mySlot==='player1'){
+      sb.from('rooms').update({status:'done'}).eq('id',roomId);
+    }
+    if(!resultShown){
+      resultShown=true;
+      stopPolling();
+      setTimeout(()=>showResult(),1500);
+    }
+  } else {
+    curQ=next;
+    setTimeout(()=>loadQ(),2000);
+  }
+}
+
+function updateLeader(){
+  const ms=document.getElementById('mysc');
+  const os=document.getElementById('oppsc');
+  const mb=document.getElementById('mybox');
+  const ob=document.getElementById('oppbox');
+  if(myScore>=oppScore){ms.classList.add('g');os.classList.remove('g');mb.classList.add('ld');ob.classList.remove('ld');}
+  else{os.classList.add('g');ms.classList.remove('g');ob.classList.add('ld');mb.classList.remove('ld');}
+}
+
+function showResult(){
+  show('result');
+  const won=myScore>oppScore,draw=myScore===oppScore;
+  document.getElementById('rcrown').textContent=won?'🏆':draw?'🤝':'💀';
+  const l1=document.getElementById('rl1');
+  l1.textContent=won?'KAZANDIN':draw?'BERABERE':'KAYBETTİN';
+  l1.style.color=won?'var(--w)':draw?'var(--w)':'var(--r)';
+  document.getElementById('rl2').textContent=won?'BRO 🔥':draw?'OLMAZ':'AMA...';
+  document.getElementById('rsub').textContent=won?'// rakibini geçtin, viral sensin':draw?'// aynı? rematch şart':'// rematch kabul et, intikam al';
+  document.getElementById('rsmynm').textContent=myName.toUpperCase();
+  document.getElementById('rsoppnm').textContent=(oppName||'RAKİP').toUpperCase();
+  document.getElementById('rsmysc').textContent=myScore;
+  document.getElementById('rsoppsc').textContent=oppScore;
+  if(won){document.getElementById('rsme').classList.add('win');document.getElementById('rsmysc').classList.add('g');}
+  else if(!draw){document.getElementById('rsopp').classList.add('win');document.getElementById('rsoppsc').classList.add('g');}
+}
+
+function shareResult(){
+  const won=myScore>oppScore,draw=myScore===oppScore;
+  const base=location.origin+location.pathname;
+  const msg=won
+    ?`🏆 Kim Daha Viral'de ${oppName||'rakibimi'} ${myScore}-${oppScore} yendim 😂 Seni de geçerim: ${base}`
+    :draw?`🤝 Kim Daha Viral'de berabere kaldık ${myScore}-${oppScore}. Rematch: ${base}`
+    :`💀 Kim Daha Viral'de ${myScore}-${oppScore} kaybettim... Ama seni de denerim: ${base}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function copyLink(){
+  const url=location.origin+location.pathname+'?room='+roomId;
+  navigator.clipboard.writeText(url).then(()=>{
+    const b=document.querySelector('.cpybtn');
+    b.textContent='KOPYALANDI ✓';
+    setTimeout(()=>b.textContent='KOPYALA',2000);
+  });
+}
+
+function showErr(){
+  const e=document.getElementById('err-name');
+  e.style.display='block';
+  setTimeout(()=>e.style.display='none',2000);
+}
+</script>
+</body>
+</html>
